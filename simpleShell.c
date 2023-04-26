@@ -16,9 +16,10 @@
 
 
 
-char line[100];
+/*char line[100];
 char cmd[50];
 char *params[50] = {NULL};
+*/
 
 /**
  *
@@ -40,8 +41,9 @@ void print_prompt(void)
  *
  *
  */
-char *get_line(void)
+char *get_line(char *line)
 {
+	
 	fgets(line, 100, stdin);
 	line[strcspn(line, "\n")] = 0;
 	return (line);
@@ -53,7 +55,7 @@ char *get_line(void)
  */
 
 
-int parser(char *_cmd)
+int parser(char *_cmd, char *cmd, char **params)
 {
 	char *temp[50];
 	int i = 0;
@@ -84,15 +86,17 @@ int main(void)
 	int status;
 	char myline[100];
 	int ch;
-
+	char cmd[50];
+	char *params[50] = {NULL};
+	
 	while (1)
 	{
 		print_prompt();
-		get_line();
-		strcpy(myline, line);
+		get_line(myline);
+		/* strcpy(myline, line);*/
 		if (strcmp(myline, "\0") == 0)
 			continue;
-		ch = parser(myline);
+		ch = parser(myline, cmd, params);
 		if (ch == -EXIT)
 			exit(0);
 		if (ch == RET)
@@ -115,9 +119,7 @@ int main(void)
 				}
 			}
 			else
-			{
 				printf("%s Command Not Found\n", params[0]);
-			}
 		}
 	} /* While(1)*/
 	return (RET);
