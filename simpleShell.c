@@ -103,19 +103,31 @@ int main(void)
 		exit(0);
 	
         if(ch==RET)
-	{	
-		int ret_pid=fork();
+	{
+		char check_command[100];
 
-		if (ret_pid<0)
-			printf("Fork Faild \n");
-		else if (ret_pid > 0)
-			wait(&status);
-		else
+    		sprintf(check_command, "which %s >/dev/null 2>&1", params[0]);
+
+    		if (system(check_command) == 0) {
+        		int ret_pid=fork();
+
+               		if (ret_pid<0)
+                        	printf("Fork Faild \n");
+                	else if (ret_pid > 0)
+                        	wait(&status);
+                	else
+                	{
+                        	execvp(cmd,params);
+                        	printf("%s Not Found\n", params[0]);
+                	}
+
+   		}
+	       	else 
 		{
-		        execvp(cmd,params);
-			printf("exec Faild \n");
-		}
+        		printf("%s Not Found\n", params[0]);
+    		}
 
+	
 	}
 
 
