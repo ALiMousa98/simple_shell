@@ -103,7 +103,7 @@ int main(void)
 				}
 			}
 			else
-				printf("%s Command Not Found\n", params[0]);
+			printf("%s Command Not Found\n", params[0]); 
 		}
 	} return (RET);
 }
