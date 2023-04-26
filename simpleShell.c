@@ -1,29 +1,8 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/utsname.h>
-
-
-#define RET 0
-#define BUILTIN_SET 2
-#define BUILTIN_EXPORT 3
-#define BUILTIN_HIST 4
-#define EXIT  5
-#define ASSIGN_LOCALVAR 1
-
-
-
-/*char line[100];
-char cmd[50];
-char *params[50] = {NULL};
-*/
+#include "helpers.h"
 
 /**
- *
- *
+ * print_prompt - prints a prompt
+ * Return: void
  */
 
 void print_prompt(void)
@@ -37,24 +16,24 @@ void print_prompt(void)
 }
 
 /**
- *
- *
- *
+ * get_line - get line
+ * @line: input line
+ * Return: result line
  */
 char *get_line(char *line)
 {
-	
 	fgets(line, 100, stdin);
 	line[strcspn(line, "\n")] = 0;
 	return (line);
 }
 
 /**
- *
- *
+ * parser - parsing input to choices
+ * @_cmd: first command ketword
+ * @cmd: entire command line
+ * @params: parameters
+ * Return: choice
  */
-
-
 int parser(char *_cmd, char *cmd, char **params)
 {
 	char *temp[50];
@@ -69,6 +48,10 @@ int parser(char *_cmd, char *cmd, char **params)
 	}
 	if (strcmp(_cmd, "exit") == 0)
 		return (-EXIT);
+	if (strcmp(_cmd, "^D") == 0)
+		return (END_OF_FILE);
+	if (strcmp(_cmd, "env") == 0)
+		return (PRINT_ENV);
 	strcpy(cmd, temp[0]);
 	for (j = 0; j < i; j++)
 		params[j] = temp[j];
@@ -77,33 +60,34 @@ int parser(char *_cmd, char *cmd, char **params)
 }
 
 /**
- *
- *
+ * main - main function
+ * Return: int
  */
 
 int main(void)
 {
-	int status;
-	char myline[100];
-	int ch;
-	char cmd[50];
-	char *params[50] = {NULL};
-	
+	int status, ch, ret_pid;
+	char myline[100], cmd[50], check_command[100];
+	char *params[50] = {NULL}, **env = NULL;
+
 	while (1)
 	{
 		print_prompt();
 		get_line(myline);
-		/* strcpy(myline, line);*/
 		if (strcmp(myline, "\0") == 0)
 			continue;
 		ch = parser(myline, cmd, params);
 		if (ch == -EXIT)
 			exit(0);
+		if (ch == END_OF_FILE)
+		{
+			end_file(myline);
+			break;
+		}
+		if (ch == PRINT_ENV)
+			print_enviro(env);
 		if (ch == RET)
 		{
-			char check_command[100];
-			int ret_pid;
-
 			sprintf(check_command, "which %s >/dev/null 2>&1", params[0]);
 			if (system(check_command) == 0)
 			{
@@ -121,7 +105,6 @@ int main(void)
 			else
 				printf("%s Command Not Found\n", params[0]);
 		}
-	} /* While(1)*/
-	return (RET);
+	} return (RET);
 }
 
